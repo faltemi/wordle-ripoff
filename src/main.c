@@ -1,8 +1,13 @@
 #include "raylib.h"
 #include <stddef.h>
 
-#define PLAYER_GUESSES  6
-#define NUM_LETTERS     5
+#define NUM_GUESSES         6
+#define NUM_LETTERS         5
+#define CELL_SIZE           50
+#define CELL_Y_OFFSET       50
+#define CELL_X_OFFSET       150
+#define CELL_PADDING        5
+
 
 typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, ENDING } GameScreen;
 
@@ -32,15 +37,20 @@ int main(){
     int framesCounter = 0;
     int gameResult = -1;
 
-    LetterCell letterCells[PLAYER_GUESSES][NUM_LETTERS] = { 0 };
+    LetterCell cells[NUM_GUESSES][NUM_LETTERS] = { 0 };
+
     // Initialize letter cells
-    for (int r = 0; r < PLAYER_GUESSES; r++){
+    for (int r = 0; r < NUM_GUESSES; r++){
         for (int c = 0; c < NUM_LETTERS; c++){
-            letterCells[r][c].active = false;
-            letterCells[r][c].letter = '\0';
-            letterCells[r][c].size = (Vector2){ screenWidth/NUM_LETTERS, 20 };
-            letterCells[r][c].position = (Vector2){ c*letterCells[r][c].size.x, r*letterCells[r][c].size.y + 100 }; // Add y offset
-            letterCells[r][c].bounds = (Rectangle){ letterCells[r][c].position.x, letterCells[r][c].position.y, letterCells[r][c].size.x, letterCells[r][c].size.y };
+            cells[r][c].active = false;
+            cells[r][c].letter = '\0';
+            cells[r][c].size = (Vector2){ CELL_SIZE, CELL_SIZE };
+            // Center with respect to padding (which isnt ba)
+            int offsetX = (GetScreenWidth()/2 - (NUM_LETTERS*CELL_SIZE + (CELL_PADDING*NUM_LETTERS-1))/2);
+            int paddingX = c == 0 ? 0 : CELL_PADDING;
+            int paddingY = r == 0 ? 0 : CELL_PADDING;
+            cells[r][c].position = (Vector2){ c*(cells[r][c].size.x + paddingX) + offsetX, r*(cells[r][c].size.y + paddingY) + CELL_Y_OFFSET }; 
+            cells[r][c].bounds = (Rectangle){ cells[r][c].position.x, cells[r][c].position.y, cells[r][c].size.x, cells[r][c].size.y };
         }
     }
 
@@ -96,17 +106,24 @@ int main(){
                 } break;
                 case TITLE:
                 {
-                    DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
-                    DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
+                    DrawRectangle(0, 0, screenWidth, screenHeight, DARKBROWN);
+                    DrawText("\"WORDLE\"", GetScreenWidth()/2 - MeasureText("\"WORDLE\"", 40)/2, GetScreenHeight()/2, 40, DARKGREEN);
                     // Every half second toggle text (60 fps)
                     if ((framesCounter/30)%2 == 0)
                         DrawText("PRESS [ENTER] to START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] to START", 20)/2, GetScreenHeight()/2 + 60, 20, DARKGRAY);
                 } break;
                 case GAMEPLAY:
                 {
-                    DrawRectangle(0, 0, screenWidth, screenHeight, PURPLE);
-                    DrawText("GAMEPLAY SCREEN", 20, 20, 40, MAROON);
-                    DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+                    DrawRectangle(0, 0, screenWidth, screenHeight, RAYWHITE);
+                    
+                    // Draw lettercells
+                    for (int r = 0; r < NUM_GUESSES; ++r){
+                        for(int c = 0; c < NUM_LETTERS; ++c){
+                            // ToDo: Active cell highlighted
+                            if ( (r + c) % 2 == 0) DrawRectangle(cells[r][c].position.x, cells[r][c].position.y, cells[r][c].size.x, cells[r][c].size.y, GRAY);
+                            else DrawRectangle(cells[r][c].position.x, cells[r][c].position.y, cells[r][c].size.x, cells[r][c].size.y, LIGHTGRAY);
+                        }
+                    }
                 } break;
                 case ENDING:
                 {
