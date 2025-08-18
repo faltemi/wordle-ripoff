@@ -25,7 +25,7 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 add_executable(wordle ${SRC_FILES})
 
 # If you keep headers in include/, uncomment:
-# target_include_directories(wordle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(wordle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Link raylib
 target_link_libraries(wordle PRIVATE raylib)
