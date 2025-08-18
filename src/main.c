@@ -38,7 +38,7 @@ int main(){
     // NOTE: Load resources (textures, fonts, audio) after Window initialization
     
     // Setup initial game state
-    GameScreen screen = LOGO;
+    GameScreen screen = TITLE;
 
     int framesCounter = 0;
     int gameResult = -1;
@@ -105,7 +105,7 @@ int main(){
                 case TITLE:
                 {
                     DrawRectangle(0, 0, screenWidth, screenHeight, DARKBROWN);
-                    DrawText("\"WORDLE\"", GetScreenWidth()/2 - MeasureText("\"WORDLE\"", 40)/2, GetScreenHeight()/2, 40, DARKGREEN);
+                    DrawText("\"WORDLE\"", (GetScreenWidth() - MeasureText("\"WORDLE\"", 40))/2, GetScreenHeight()/2, 40, DARKGREEN);
                     // Every half second toggle text (60 fps)
                     if ((framesCounter/30)%2 == 0)
                         DrawText("PRESS [ENTER] to START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] to START", 20)/2, GetScreenHeight()/2 + 60, 20, DARKGRAY);
@@ -117,9 +117,7 @@ int main(){
                     // Draw lettercells
                     for (int r = 0; r < NUM_GUESSES; ++r){
                         for(int c = 0; c < NUM_LETTERS; ++c){
-                            // ToDo: Active cell highlighted
-                            if ( (r + c) % 2 == 0) DrawRectangle(cells[r][c].position.x, cells[r][c].position.y, cells[r][c].size.x, cells[r][c].size.y, GRAY);
-                            else DrawRectangle(cells[r][c].position.x, cells[r][c].position.y, cells[r][c].size.x, cells[r][c].size.y, LIGHTGRAY);
+                            DrawLetterCell(&cells[r][c]);
                         }
                     }
                 } break;

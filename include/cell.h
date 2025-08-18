@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+#define BORDER_SIZE 2
+
 typedef enum CellState {
     NO_GUESS,
     WRONG_POS,
