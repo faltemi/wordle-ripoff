@@ -11,6 +11,20 @@
 
 typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, ENDING } GameScreen;
 
+// Position calculation for letter cells
+static inline void InitLetterCellAt(LetterCell *cell, int row, int col) {
+    // Center with respect to padding (which isnt ba)
+    const int paddingX = col == 0 ? 0 : CELL_PADDING;
+    const int paddingY = row == 0 ? 0 : CELL_PADDING;
+
+    const int totalW = NUM_LETTERS*CELL_SIZE + CELL_PADDING*(NUM_LETTERS-1);
+    const int offsetX = (GetScreenWidth() - totalW)/2;
+
+    const int posX = col*(CELL_SIZE + paddingX) + offsetX;
+    const int posY = row*(CELL_SIZE + paddingY) + CELL_Y_OFFSET;
+
+    InitLetterCell(cell, CELL_SIZE, CELL_SIZE, posX, posY, LETTER_SIZE);
+}
 
 int main(){
     // Initialization
@@ -34,13 +48,7 @@ int main(){
     // Initialize letter cells
     for (int r = 0; r < NUM_GUESSES; r++){
         for (int c = 0; c < NUM_LETTERS; c++){
-            // Center with respect to padding (which isnt ba)
-            int offsetX = (GetScreenWidth()/2 - (NUM_LETTERS*CELL_SIZE + (CELL_PADDING*(NUM_LETTERS-1)))/2);
-            int paddingX = c == 0 ? 0 : CELL_PADDING;
-            int paddingY = r == 0 ? 0 : CELL_PADDING;
-            int posX = c*(CELL_SIZE + paddingX) + offsetX;
-            int posY = r*(CELL_SIZE + paddingY) + CELL_Y_OFFSET;
-            InitLetterCell(&cells[r][c], CELL_SIZE, CELL_SIZE, posX, posY, 20);
+            InitLetterCellAt(&cells[r][c], r, c);
         }
     }
 
