@@ -10,7 +10,8 @@ typedef enum CellState {
     WRONG_POS,
     CORRECT,
     INCORRECT,
-    BEING_GUESSED
+    BEING_GUESSED,
+    KEYBOARD // This is for when the cells are reused for the on screen keyboard
 } CellState;
 
 typedef struct LetterCell {
