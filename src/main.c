@@ -1,23 +1,60 @@
 #include "raylib.h"
+#include "cell.h"
+
+#define NUM_GUESSES         6
+#define NUM_LETTERS         5
+#define CELL_SIZE           50
+#define CELL_Y_OFFSET       50
+#define CELL_X_OFFSET       150
+#define CELL_PADDING        5
+#define LETTER_SIZE         20
 
 typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, ENDING } GameScreen;
 
+// Position calculation for letter cells
+static inline void InitLetterCellAt(LetterCell *cell, int row, int col) {
+    // Center with respect to padding (which isnt ba)
+    const int paddingX = col == 0 ? 0 : CELL_PADDING;
+    const int paddingY = row == 0 ? 0 : CELL_PADDING;
+
+    const int totalW = NUM_LETTERS*CELL_SIZE + CELL_PADDING*(NUM_LETTERS-1);
+    const int offsetX = (GetScreenWidth() - totalW)/2;
+
+    const int posX = col*(CELL_SIZE + paddingX) + offsetX;
+    const int posY = row*(CELL_SIZE + paddingY) + CELL_Y_OFFSET;
+
+    InitLetterCell(cell, CELL_SIZE, CELL_SIZE, posX, posY, LETTER_SIZE);
+}
+
 int main(){
+    // Initialization
+    // ----------------------------------------------------------------
     // Window setup parameters
     const int screenWidth = 800;
     const int screenHeight = 600;
     const char *windowTitle = "Wordle Clone";
 
     InitWindow(screenWidth, screenHeight, windowTitle);
+    // NOTE: Load resources (textures, fonts, audio) after Window initialization
     
     // Setup initial game state
-    GameScreen screen = LOGO;
+    GameScreen screen = TITLE;
 
     int framesCounter = 0;
     int gameResult = -1;
 
+    LetterCell cells[NUM_GUESSES][NUM_LETTERS] = { 0 };
+
+    // Initialize letter cells
+    for (int r = 0; r < NUM_GUESSES; r++){
+        for (int c = 0; c < NUM_LETTERS; c++){
+            InitLetterCellAt(&cells[r][c], r, c);
+        }
+    }
+
     // Desired framerate
     SetTargetFPS(60);
+    // ----------------------------------------------------------------
 
     // Main loop
     while(!WindowShouldClose()){
@@ -67,15 +104,22 @@ int main(){
                 } break;
                 case TITLE:
                 {
-                    DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
-                    DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
-                    DrawText("PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
+                    DrawRectangle(0, 0, screenWidth, screenHeight, DARKBROWN);
+                    DrawText("\"WORDLE\"", (GetScreenWidth() - MeasureText("\"WORDLE\"", 40))/2, GetScreenHeight()/2, 40, DARKGREEN);
+                    // Every half second toggle text (60 fps)
+                    if ((framesCounter/30)%2 == 0)
+                        DrawText("PRESS [ENTER] to START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] to START", 20)/2, GetScreenHeight()/2 + 60, 20, DARKGRAY);
                 } break;
                 case GAMEPLAY:
                 {
-                    DrawRectangle(0, 0, screenWidth, screenHeight, PURPLE);
-                    DrawText("GAMEPLAY SCREEN", 20, 20, 40, MAROON);
-                    DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+                    DrawRectangle(0, 0, screenWidth, screenHeight, RAYWHITE);
+                    
+                    // Draw lettercells
+                    for (int r = 0; r < NUM_GUESSES; ++r){
+                        for(int c = 0; c < NUM_LETTERS; ++c){
+                            DrawLetterCell(&cells[r][c]);
+                        }
+                    }
                 } break;
                 case ENDING:
                 {
@@ -90,9 +134,9 @@ int main(){
     }
 
     // De-Initialize
-    // ------------------------------------------------------------
+    // ----------------------------------------------------------------
 
     CloseWindow();
-    // ------------------------------------------------------------
+    // ----------------------------------------------------------------
     return 0;
 }
